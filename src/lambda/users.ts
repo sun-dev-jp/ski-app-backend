@@ -16,10 +16,14 @@ export const getUsers: APIGatewayProxyHandler = async (event) => {
 /** GET /users/{id} */
 export const getUser: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent) => {
   console.log("pathParameters = " + JSON.stringify(event.pathParameters, undefined, 2))
+
+  // ユーザーID
+  const principalId = event.requestContext.authorizer?.principalId
   
   const id = event.pathParameters?.["id"]
   
-  return createResponse(USERS.find((b) => b.id === id))
+  // return createResponse(USERS.find((b) => b.id === id))
+  return createResponse(event)
 }
 
 /** レスポンスデータを生成する */
