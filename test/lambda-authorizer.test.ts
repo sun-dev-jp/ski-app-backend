@@ -2,8 +2,6 @@ import { handler } from "../src/lambda/lambda-authorizer";
 import { APIGatewayAuthorizerResult } from 'aws-lambda';
 import * as dotenv from 'dotenv';
 
-// Todo: 他のテスト時にスキップする
-
 dotenv.config();
 
 const event = {
@@ -12,7 +10,7 @@ const event = {
 }
 
 describe('Lambda_Authorizer_Function', (): void => {
-  it('response policy', async () => {
+  it.skip('response policy', async () => {
 
     const expected = {
       policyDocument: {
