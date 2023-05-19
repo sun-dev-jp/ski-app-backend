@@ -61,14 +61,14 @@ export class SkiAppBackendStack extends Stack {
     const users = api.root.addResource("users")
 
     /** (GET users */
-    users.addMethod("GET", new apigateway.LambdaIntegration(getUsers), {
-      authorizer: lambdaAuth
-    });
+    users.addMethod("GET", new apigateway.LambdaIntegration(getUsers));
     
 
     /** (GET user/{id}) */
     const user = users.addResource("{id}")
-    user.addMethod("GET", new apigateway.LambdaIntegration(getUser))
+    user.addMethod("GET", new apigateway.LambdaIntegration(getUser), {
+      authorizer: lambdaAuth
+    })
 
   }
 }
