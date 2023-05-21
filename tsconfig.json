@@ -21,7 +21,11 @@
     "strictPropertyInitialization": false,
     "typeRoots": [
       "./node_modules/@types"
-    ]
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "/opt/nodejs/client": ["src/lambda/layers/prisma/client"]
+    },
   },
   "exclude": [
     "node_modules",

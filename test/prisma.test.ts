@@ -1,21 +1,56 @@
 import * as dotenv from 'dotenv';
-import { create } from '../lib/prisma';
+// import { getUser, getUsers, createUser } from '../src/lambda/prisma';
+import { handler } from '../src/lambda/prisma';
+import { createUser } from '../src/lambda/layers/prisma/client';
 
 dotenv.config();
 
-describe('Lambda_Authorizer_Function', (): void => {
-  it.skip('response policy', async () => {
+jest.mock('../src/lambda/layers/prisma/client', () => ({
+  createUser: jest.fn()
+}));
 
+// jest.mock('/opt/client', () => ({
+//   createUser: jest.fn()
+// }));
+
+describe('prisma', (): void => {
+  // it('response getUser', async () => {
+
+  //   const expected = {
+  //     id: 1,
+  //     name: "あいうえお"
+  //   };
+
+  //   const result = await getUser()
+
+  //   expect(result).toEqual(expected);
+
+  // });
+
+  // it('response getUsers', async () => {
+
+  //   const expected = {
+  //     id: 1,
+  //     name: "あいうえお"
+  //   };
+
+  //   const result = await getUsers()
+
+  //   expect(result).toEqual(expected);
+
+  // });
+
+  it('response create', async () => {
     const expected = {
       name: "あいうえお"
     };
 
-    const result = await create()
+    const result = await handler()
 
-    const { id, ...resultWithoutId } = result; 
-
-    expect(resultWithoutId).toEqual(expected);
+    expect(result).toEqual(expected);
 
   });
+
+  
 });
 

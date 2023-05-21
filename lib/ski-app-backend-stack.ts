@@ -7,12 +7,46 @@ import {
 } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as dotenv from 'dotenv';
+import * as path from 'path';
 
 dotenv.config();
 
 export class SkiAppBackendStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
+
+    const prismaLayer = new lambda.LayerVersion(this, 'PrismaLayer', {
+      compatibleRuntimes: [lambda.Runtime.NODEJS_16_X],
+      description: 'Prisma Layer',
+      code: lambda.Code.fromAsset(path.join(__dirname, '../src/lambda/layers/prisma'), {
+        bundling: {
+          image: lambda.Runtime.NODEJS_16_X.bundlingImage,
+          command: [
+            'bash',
+            '-c',
+            [
+              'mkdir -p /asset-output/nodejs',
+              'cp package.json package-lock.json client.js .env /asset-output/nodejs',
+              'cp -r prisma /asset-output/nodejs/prisma',
+              'cp -r node_modules /asset-output/nodejs/node_modules',
+              // 'rm -rf /asset-output/node_modules/.cache',
+              // 'rm -rf /asset-output/node_modules/.prisma/client/*darwin*' || true,
+              // 'rm -rf /asset-output/node_modules/.prisma/client/*windows*' || true,
+              // 'rm -rf /asset-output/node_modules/@prisma/engines/node_modules',
+              // 'rm -r /asset-output/node_modules/@prisma/engines/*darwin* || true',
+              // 'rm -r /asset-output/node_modules/@prisma/engines/*debian* || true',
+              // 'rm -f /asset-output/node_modules/prisma/*darwin* || true',
+              // 'rm -f /asset-output/node_modules/prisma/*debian* || true',
+              // 'rm -f /asset-output/node_modules/prisma/*windows* || true',
+              'cd /asset-output/nodejs/',
+              'npx prisma generate',
+            ].join(' && '),
+          ],
+          user: 'root',
+        },
+      }),
+      layerVersionName: `prisma-layer`,
+    });
 
     // ------------------------------
     // Lambda_Authorizer_Function
@@ -30,10 +64,11 @@ export class SkiAppBackendStack extends Stack {
 
     /** GET users */
     const getUsers = new lambda_nodejs.NodejsFunction(this, "getUsers", {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_16_X,
       functionName: "getUsers",
       entry: "src/lambda/users.ts",
-      handler: "getUsers"
+      handler: "getUsers",
+      layers: [prismaLayer],
     })
 
     /** GET users/{id} */
