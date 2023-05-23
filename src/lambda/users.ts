@@ -1,9 +1,5 @@
 import { APIGatewayProxyHandler, APIGatewayProxyResult, APIGatewayProxyEvent } from "aws-lambda"
-// import { PrismaClient } from "@prisma/client"
 import { createUser } from '/opt/nodejs/client';
-// import { PrismaClient } from '@prisma/client';
-
-// const prisma = new PrismaClient();
 
 const USERS = [
   { id: "1", name: "田中" },
@@ -16,16 +12,14 @@ export const getUsers: APIGatewayProxyHandler = async (event: APIGatewayProxyEve
   console.log("pathParameters = " + JSON.stringify(event.pathParameters, undefined, 2))
 
   const user = await createUser('Alice');
+  // const users = await prisma.user.findMany();
 
   return {
     statusCode: 201,
     body: JSON.stringify({ user }),
   };
 
-  // const users = await prisma.user.findMany();
-
   // return createResponse(users);
-  // return createResponse("hoge");
 }
 
 /** GET /users/{id} */
