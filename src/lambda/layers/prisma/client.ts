@@ -20,3 +20,5 @@ export const createUser = async (name: string) => {
 
   return name;
 }
+
+createUser("136")
