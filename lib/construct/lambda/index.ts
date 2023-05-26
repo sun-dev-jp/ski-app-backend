@@ -5,21 +5,28 @@ import { Users } from './users';
 
 export interface LambdaProps {}
 
+export type UserHandlers = {
+  getUsers: lambda_nodejs.NodejsFunction
+  getUser: lambda_nodejs.NodejsFunction
+}
+
 
 export class Lambda extends Construct {
 
-  readonly authHandler: lambda_nodejs.NodejsFunction
-  readonly getUsersHandler: lambda_nodejs.NodejsFunction
-  readonly getUserHandler: lambda_nodejs.NodejsFunction
+  readonly authorizer: lambda_nodejs.NodejsFunction
+  readonly users: UserHandlers
 
   constructor(scope: Construct, id: string, props?: LambdaProps) {
     super(scope, id);
 
-    this.authHandler = new Auth(this, "Auth").authHandler
+    const auth = new Auth(this, "Auth")
+    this.authorizer = auth.authorizer
 
     const users = new Users(this, "Users")
-    this.getUsersHandler = users.getUsersHandler
-    this.getUserHandler = users.getUserHandler 
+    this.users = {
+      getUsers: users.getUsers,
+      getUser: users.getUser,
+    };
 
   }
 }

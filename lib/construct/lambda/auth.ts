@@ -9,13 +9,12 @@ export interface AuthProps {}
 
 export class Auth extends Construct {
 
-  readonly authHandler: lambda_nodejs.NodejsFunction
+  readonly authorizer: lambda_nodejs.NodejsFunction
 
   constructor(scope: Construct, id: string, props?: AuthProps) {
     super(scope, id);
 
-    /** Auth */
-    const authHandler = new lambda_nodejs.NodejsFunction(this, "Lambda_Authorizer_Function", {
+    this.authorizer = new lambda_nodejs.NodejsFunction(this, "Lambda_Authorizer_Function", {
       runtime: lambda.Runtime.NODEJS_18_X,
       functionName: "Lambda_Authorizer_Function",
       entry: 'src/lambda/lambda-authorizer.ts',
@@ -25,6 +24,5 @@ export class Auth extends Construct {
         TOKEN_ISSUER: process.env.TOKEN_ISSUER!
       },
     });
-    this.authHandler = authHandler
   }
 }
