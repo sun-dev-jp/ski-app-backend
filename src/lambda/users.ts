@@ -1,4 +1,7 @@
 import { APIGatewayProxyHandler, APIGatewayProxyResult, APIGatewayProxyEvent } from "aws-lambda"
+import supabase from "../lib/supabase/client"
+
+const TABLE_NAME = 'User'
 
 const USERS = [
   { id: "1", name: "田中" },
@@ -6,11 +9,52 @@ const USERS = [
   { id: "3", title: "山田" },
 ]
 
+
 /** GET /users */
 export const getUsers: APIGatewayProxyHandler = async (event) => {
   console.log("pathParameters = " + JSON.stringify(event.pathParameters, undefined, 2))
 
-  return createResponse(USERS)
+  const selectUsers = async () => {
+    const { data, error } = await supabase
+      .from('users')
+      .select();
+    
+    if (error) {
+      throw error;
+    }
+    
+    console.log(data)
+    return data;
+  }
+  // await selectUsers();
+
+  const insertUsers = async () => {
+    const { error } = await supabase
+      .from('users')
+      .insert({ user_id: "hogehoge", })
+    
+    if (error) {
+      throw error;
+    }
+  }
+  // await insertUsers();
+
+  const joinSelectUsers = async () => {
+    const { data, error } = await supabase
+      .from('users')
+      .select('user_id, user_profiles (last_name)')
+    
+    if (error) {
+      throw error;
+    }
+
+    console.log(data)
+  }
+  // await joinSelectUsers();
+  
+
+  // return createResponse(USERS)
+  return createResponse(await selectUsers())
 }
 
 /** GET /users/{id} */

@@ -20,7 +20,11 @@ export class Users extends Construct {
       runtime: lambda.Runtime.NODEJS_18_X,
       functionName: "getUsers",
       entry: "src/lambda/users.ts",
-      handler: "getUsers"
+      handler: "getUsers",
+      environment: {
+        SUPABASE_URL: process.env.SUPABASE_URL!,
+        SUPABASE_API_KEY: process.env.SUPABASE_API_KEY!,
+      },
     })
 
     /** GET users/{id} */
