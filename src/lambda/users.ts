@@ -1,7 +1,7 @@
-import { APIGatewayProxyHandler, APIGatewayProxyResult, APIGatewayProxyEvent } from "aws-lambda"
-import supabase from "../lib/supabase/client"
-
-const TABLE_NAME = 'User'
+import { APIGatewayProxyHandler, APIGatewayProxyEvent } from "aws-lambda";
+import * as AWS from 'aws-sdk';
+import { createResponse } from "../lib/response";
+import supabase from "../lib/supabase/client";
 
 const USERS = [
   { id: "1", name: "田中" },
@@ -51,10 +51,18 @@ export const getUsers: APIGatewayProxyHandler = async (event) => {
     console.log(data)
   }
   // await joinSelectUsers();
+
+  const s3 = new AWS.S3();
+  const params = {
+    Bucket: process.env.BUCKET_NAME!,
+    Key: 'test.txt',
+  };
+  const res = await s3.getObject(params).promise();
   
 
   // return createResponse(USERS)
-  return createResponse(await selectUsers())
+  // return createResponse(await selectUsers())
+  return createResponse(res.Body?.toString());
 }
 
 /** GET /users/{id} */
@@ -70,13 +78,26 @@ export const getUser: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
   return createResponse(event)
 }
 
-/** レスポンスデータを生成する */
-function createResponse(body: any): APIGatewayProxyResult {
-  return {
-    statusCode: 200,
-    body: JSON.stringify(body),
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-    }, 
-  }
+
+/** POST /users */
+export const postUser: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent) => {
+  console.log("pathParameters = " + JSON.stringify(event.pathParameters, undefined, 2))
+
+  const principalId = event.requestContext.authorizer?.principalId;
+
+  // supabaseからuser_idで取得
+
+  // 存在しない場合作成
+
+  // 存在した場合更新
+  
+  return createResponse(event.body);
 }
+
+/** POST /users */
+// export const putUser: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent) => {
+//   console.log("pathParameters = " + JSON.stringify(event.pathParameters, undefined, 2))
+  
+//   return createResponse(event.body);
+// }
+

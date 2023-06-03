@@ -9,7 +9,7 @@ export interface UsersProps {
 }
 
 export class Users extends Construct {
-  readonly authorizer: apigateway.TokenAuthorizer
+  readonly authorizer: apigateway.TokenAuthorizer;
 
   constructor(scope: Construct, id: string, props: UsersProps) {
     super(scope, id);
@@ -22,16 +22,19 @@ export class Users extends Construct {
       new apigateway.LambdaIntegration(props.userHandlers.getUsers)
     );
 
-    /** GET user/{id} */
+    /** GET users/{id} */
     const user = users.addResource("{id}")
     user.addMethod(
       "GET",
       new apigateway.LambdaIntegration(props.userHandlers.getUser),
-      {
-        authorizer: props.authorizer
-      }
-    )
+      { authorizer: props.authorizer }
+    );
 
-    
+    /** POST users */
+    users.addMethod(
+      "POST",
+      new apigateway.LambdaIntegration(props.userHandlers.postUser),
+      { authorizer: props.authorizer }
+    );
   }
 }
