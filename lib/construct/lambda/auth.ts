@@ -17,7 +17,7 @@ export class Auth extends Construct {
     this.authorizer = new lambda_nodejs.NodejsFunction(this, "Lambda_Authorizer_Function", {
       runtime: lambda.Runtime.NODEJS_18_X,
       functionName: "Lambda_Authorizer_Function",
-      entry: 'src/lambda/lambda-authorizer.ts',
+      entry: 'src/lambda/authorizer.ts',
       environment: {
         AUDIENCE: process.env.AUDIENCE!,
         JWKS_URI: process.env.JWKS_URI!,

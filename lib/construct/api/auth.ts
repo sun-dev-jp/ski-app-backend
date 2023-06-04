@@ -5,6 +5,7 @@ export interface AuthProps {
   handler: lambda_nodejs.NodejsFunction
 }
 
+
 export class Auth extends Construct {
   readonly authorizer: apigateway.TokenAuthorizer
 
