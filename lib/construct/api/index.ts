@@ -3,6 +3,7 @@ import { Construct } from "constructs";
 import { Lambda } from '../lambda';
 import { Auth } from './auth';
 import { Users } from './users';
+import { GatewayResponse } from './gateway-response';
 
 export interface ApiProps {
   lambda: Lambda
@@ -22,23 +23,7 @@ export class Api extends Construct {
       },
     })
 
-    api.addGatewayResponse('unauthorized-response', {
-      type: apigateway.ResponseType.UNAUTHORIZED,
-      statusCode: '401',
-      responseHeaders: {
-        'Access-Control-Allow-Origin' : "'*'",
-        'Access-Control-Allow-Headers': "'*'"
-      },
-    });
-
-    api.addGatewayResponse('access-denied-response', {
-      type: apigateway.ResponseType.ACCESS_DENIED,
-      statusCode: '403',
-      responseHeaders: {
-        'Access-Control-Allow-Origin' : "'*'",
-        'Access-Control-Allow-Headers': "'*'"
-      },
-    });
+    new GatewayResponse(this, "GatewayResponse", { api });
 
     const auth = new Auth(this, 'Auth', {
       handler: props.lambda.authorizer
@@ -49,5 +34,18 @@ export class Api extends Construct {
       userHandlers: props.lambda.users,
       authorizer: auth.authorizer
     });
+
+    const checkout = api.root.addResource("checkout");
+    checkout.addMethod(
+      "GET",
+      new apigateway.LambdaIntegration(props.lambda.payment.checkout)
+    );
+
+    const webhook = api.root.addResource("webhook");
+    webhook.addMethod(
+      "POST",
+      new apigateway.LambdaIntegration(props.lambda.payment.webhook)
+    );
+
   }
 }
